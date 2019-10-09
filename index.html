@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>SSE Demo</title>
+</head>
+
+<body>
+    <div id="page"></div>
+    <script>
+        // SSE的API在EventSource对象上
+        // 可以使用 if('EventSource' in window) 判断浏览器是否支持SSE
+        // 建立SSE连接，直接如下创建EventSource实例，支持跨越
+        var source = new EventSource("http://127.0.0.1:9988/createSse");
+
+        // EventSource.readyState代表连接状态，有以下三种情况
+        // 0 —> 连接还未建立，或者正在断线重连
+        // 1 -> 连接已建立，可以接受数据
+        // 2 -> 连接已关闭或请求错误
+
+        var div = document.getElementById("page");
+
+        // 连接创建成功的回调事件
+        source.onopen = function (event) {
+            div.innerHTML += "<p>Connection open ...</p>";
+        };
+
+        // 连接创建失败的回调事件
+        source.onerror = function (event) {
+            div.innerHTML += "<p>Connection close.</p>";
+        };
+
+        // 自定义事件，服务端返回时设置event字段为自定义事件名称
+        source.addEventListener("connecttime",
+            function (event) {
+                div.innerHTML += "<p>Start time: " + event.data + "</p>";
+            },
+            false
+        );
+
+        // 接受到数据的回调事件，event未特殊设置时，默认是message
+        source.onmessage = function (event) {
+            div.innerHTML += "<p>message event: " + event.lastEventId + "</p>";
+        };
+
+        // 关闭连接  source.close();
+
+    </script>
+</body>
+
+</html>
